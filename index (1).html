@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pink Confession ♡</title>
+<style>
+*{box-sizing:border-box}
+body{
+ margin:0;padding:20px;
+ min-height:100vh;
+ font-family:Georgia,serif;
+ color:#824c63;
+ background:linear-gradient(135deg,#ffe1ed,#fff8fb,#fbd6e5);
+ display:flex;justify-content:center;align-items:center;
+}
+.app{width:100%;max-width:550px}
+header{text-align:center;color:#bd6386;margin-bottom:20px}
+.card{
+ background:#ffffffdf;border-radius:28px;
+ padding:40px 25px;text-align:center;
+ min-height:390px;display:flex;
+ flex-direction:column;justify-content:center;
+ box-shadow:0 15px 45px #d77b9b35;
+}
+.heart{font-size:48px}
+h1{color:#b64e78;font-size:32px}
+.message{font-size:17px;line-height:1.8;white-space:pre-wrap}
+button{ 
+ border:0;border-radius:25px;padding:12px 20px;
+ background:#ec91b1;color:white;
+ font-weight:bold;cursor:pointer;margin:5px;
+}
+button:disabled{opacity:.4}
+.controls{text-align:center;margin-top:18px}
+.musicbox,.editor{
+ background:#ffffffcf;border-radius:20px;
+ padding:18px;margin-top:18px;
+}
+.musicbox h3,.editor summary{color:#b64e78}
+input,textarea{
+ width:100%;padding:11px;margin:7px 0;
+ border:1px solid #f0bfd2;border-radius:10px;
+ background:#fffafd;color:#75465a;
+}
+textarea{min-height:75px}
+label{font-size:13px;font-weight:bold}
+#progress{color:#b66a88;text-align:center;font-size:13px}
+</style>
+</head>
+<body>
+<div class="app">
+
+<header>
+<h2>♡ A LITTLE CONFESSION ♡</h2>
+<p>A special message for you</p>
+</header>
+
+<div class="card">
+<div class="heart" id="emoji">💌</div>
+<h1 id="title">Hai, kamu...</h1>
+<p class="message" id="message">
+Ada sesuatu yang ingin aku ceritakan.
+</p>
+<p id="signature">— untuk kamu ♡</p>
+</div>
+
+<p id="progress">1 / 6</p>
+
+<div class="controls">
+<button onclick="prev()">← Kembali</button>
+<button onclick="next()">Lanjut →</button>
+</div>
+
+<!-- MUSIC PLAYER -->
+<div class="musicbox">
+<h3>🎵 Musik Favorit Kamu</h3>
+
+<input type="file" id="musicFile" accept="audio/*">
+
+<audio id="audio" controls style="width:100%;margin-top:10px"></audio>
+
+<label>Volume musik</label>
+<input type="range" id="volume"
+min="0" max="1" step="0.01" value="0.5">
+
+<p style="font-size:12px;color:#aa7890">
+Pilih lagu MP3 dari penyimpanan HP kamu.
+Tekan Play untuk memulai musik.
+</p>
+</div>
+
+<!-- TEXT EDITOR -->
+<details class="editor">
+<summary>✏️ EDIT SEMUA TEKS SLIDE</summary>
+<div id="editorFields"></div>
+</details>
+
+</div>
+
+<script>
+const defaults=[
+{
+emoji:"💌",
+title:"Hai, kamu...",
+message:"ada hal yang mau aku bilang nihh",
+signature:"— for you♡"
+},
+{
+emoji:"🌷",
+title:"sebelum itu aku gimana yaa..",
+message:"agak bingung sih, tapi aku mau ngucapin sesuatu ke kamu sihh",
+signature:"— dengerin yaaa"
+},
+{
+emoji:"☁️",
+title:"sederhana ajaaaa...",
+message:"sederhana ajaa, jadi giniii",
+signature:"— sebuah cerita"
+},
+{
+emoji:"✨",
+title:"sebenarnyaa...",
+message:"aku nyaman disetiap callan sama kamu, ngobrol sama kamu apalagi disaat dengerin cerita kamu apapun itu, rasanya tenang aja. kamu pernah mikir ga kenapa aku selalu nunggu kabar dari kamu meskipun disaat kamu slowres? karna aku ga pernah ga sabar nungguin kabar dari kamu, anjay garing",
+signature:"— real from my hearti"
+},
+{
+emoji:"💗",
+title:"pointnya sih, i like you zia",
+message:"yes, aku suka sama kamu. aku cuma nyatain perasaan ku aja gimana ke kamu, tapi gatau ya dikamu gimana.",
+signature:"— no preasure"
+},
+{
+emoji:"🫶",
+title:"thank you zia",
+message:"makasi ya udah baca sampe akhir, aku terima semua keputusan mu kok, hak kamu mau jawab terima tidaa.",
+signature:"— hati ku yang mau jujur ini♡"
+}
+];
+
+let slides=JSON.parse(
+localStorage.getItem("myConfession")
+)||JSON.parse(JSON.stringify(defaults));
+
+let current=0;
+
+function render(){
+let s=slides[current];
+document.getElementById("emoji").textContent=s.emoji;
+document.getElementById("title").textContent=s.title;
+document.getElementById("message").textContent=s.message;
+document.getElementById("signature").textContent=s.signature;
+document.getElementById("progress").textContent=
+(current+1)+" / "+slides.length;
+}
+
+function next(){
+current=(current+1)%slides.length;
+render();
+}
+
+function prev(){
+if(current>0){
+current--;
+render();
+}
+}
+
+function save(){
+localStorage.setItem("myConfession",JSON.stringify(slides));
+}
+
+function createEditor(){
+let box=document.getElementById("editorFields");
+box.innerHTML="";
+
+slides.forEach((s,i)=>{
+let section=document.createElement("div");
+section.style.marginTop="18px";
+
+let heading=document.createElement("h4");
+heading.textContent="SLIDE "+(i+1);
+section.appendChild(heading);
+
+["emoji","title","message","signature"].forEach(key=>{
+let label=document.createElement("label");
+label.textContent=key.toUpperCase();
+
+let input=key==="message"
+?document.createElement("textarea")
+:document.createElement("input");
+
+input.value=s[key];
+
+input.addEventListener("input",()=>{
+slides[i][key]=input.value;
+save();
+if(current===i)render();
+});
+
+section.append(label,input);
+});
+
+box.appendChild(section);
+});
+}
+
+// MUSIC UPLOAD
+const audio=document.getElementById("audio");
+const musicFile=document.getElementById("musicFile");
+
+let currentURL=null;
+
+musicFile.addEventListener("change",function(){
+const file=this.files[0];
+
+if(!file)return;
+
+if(currentURL){
+URL.revokeObjectURL(currentURL);
+}
+
+currentURL=URL.createObjectURL(file);
+audio.src=currentURL;
+audio.load();
+audio.play().catch(()=>{
+alert("Lagu siap! Tekan tombol Play untuk memulai.");
+});
+});
+
+document.getElementById("volume")
+.addEventListener("input",function(){
+audio.volume=this.value;
+});
+
+audio.volume=0.5;
+
+createEditor();
+render();
+</script>
+
+</body>
+</html>
